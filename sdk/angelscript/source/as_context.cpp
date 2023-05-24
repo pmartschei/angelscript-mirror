@@ -291,17 +291,7 @@ void asCContext::DetachEngine()
 	m_stackBlocks.SetLength(0);
 	m_stackBlockSize = 0;
 
-	// Clean the user data
-	for( asUINT n = 0; n < m_userData.GetLength(); n += 2 )
-	{
-		if( m_userData[n+1] )
-		{
-			for( asUINT c = 0; c < m_engine->cleanContextFuncs.GetLength(); c++ )
-				if( m_engine->cleanContextFuncs[c].type == m_userData[n] )
-					m_engine->cleanContextFuncs[c].cleanFunc(this);
-		}
-	}
-	m_userData.SetLength(0);
+	ClearUserData();
 
 	// Clear engine pointer
 	if( m_holdEngineRef )
@@ -365,6 +355,27 @@ void *asCContext::GetUserData(asPWORD type) const
 	RELEASESHARED(m_engine->engineRWLock);
 
 	return 0;
+}
+
+void asCContext::ClearUserData()
+{
+	// There may be multiple threads reading, but when
+	// setting the user data nobody must be reading.
+	ACQUIRESHARED(m_engine->engineRWLock);
+
+	// Clean the user data
+	for (asUINT n = 0; n < m_userData.GetLength(); n += 2)
+	{
+		if (m_userData[n + 1])
+		{
+			for (asUINT c = 0; c < m_engine->cleanContextFuncs.GetLength(); c++)
+				if (m_engine->cleanContextFuncs[c].type == m_userData[n])
+					m_engine->cleanContextFuncs[c].cleanFunc(this);
+		}
+	}
+	m_userData.SetLength(0);
+
+	RELEASESHARED(m_engine->engineRWLock);
 }
 
 // interface

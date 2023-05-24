@@ -131,6 +131,7 @@ public:
 	// User data
 	void *SetUserData(void *data, asPWORD type);
 	void *GetUserData(asPWORD type) const;
+	void ClearUserData();
 
 	// Serialization
 	int StartDeserialization();
