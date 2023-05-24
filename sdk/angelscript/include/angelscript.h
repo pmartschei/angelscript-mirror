@@ -961,6 +961,7 @@ public:
 	// User data
 	virtual void *SetUserData(void *data, asPWORD type = 0) = 0;
 	virtual void *GetUserData(asPWORD type = 0) const = 0;
+	virtual void ClearUserData() = 0;
 
 	// Serialization
 	virtual int StartDeserialization() = 0;
